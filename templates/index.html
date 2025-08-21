@@ -2,10 +2,54 @@
 <html>
 <head>
     <title>ESP32 Temperature Dashboard</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 40px;
+        }
+        img {
+            margin-top: 20px;
+            border: 2px solid #444;
+            border-radius: 10px;
+            max-width: 90%;
+        }
+        #temp {
+            font-size: 2em;
+            color: darkred;
+            margin: 20px 0;
+        }
+    </style>
 </head>
 <body>
     <h1>🌡 ESP32 Temperature Monitoring</h1>
-    <p><a href="/plot" target="_blank">📈 View Latest Graph</a></p>
+
     <p><a href="/download">📥 Download CSV Data</a></p>
+
+    <h2>📊 Latest Reading</h2>
+    <div id="temp">Loading...</div>
+
+    <h2>📈 Live Temperature Graph</h2>
+    <img id="plot" src="/plot" alt="Temperature Graph">
+
+    <script>
+        function updateData() {
+            // Update latest temperature
+            fetch("/latest")
+                .then(res => res.text())
+                .then(temp => {
+                    document.getElementById("temp").innerText = temp + " °C";
+                });
+
+            // Refresh graph
+            const plot = document.getElementById("plot");
+            plot.src = "/plot?rand=" + new Date().getTime();
+        }
+
+        // Run every 5 seconds
+        setInterval(updateData, 5000);
+        updateData(); // run once immediately
+    </script>
 </body>
 </html>
