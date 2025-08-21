@@ -2,54 +2,24 @@
 <html>
 <head>
     <title>ESP32 Temperature Dashboard</title>
-    <meta charset="UTF-8">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 40px;
-        }
-        img {
-            margin-top: 20px;
-            border: 2px solid #444;
-            border-radius: 10px;
-            max-width: 90%;
-        }
-        #temp {
-            font-size: 2em;
-            color: darkred;
-            margin: 20px 0;
-        }
-    </style>
+    <meta http-equiv="refresh" content="10"> <!-- refresh whole page every 10 sec -->
 </head>
 <body>
     <h1>🌡 ESP32 Temperature Monitoring</h1>
 
     <p><a href="/download">📥 Download CSV Data</a></p>
 
-    <h2>📊 Latest Reading</h2>
-    <div id="temp">Loading...</div>
-
     <h2>📈 Live Temperature Graph</h2>
-    <img id="plot" src="/plot" alt="Temperature Graph">
+    <!-- Auto-refresh graph only -->
+    <img src="/plot" alt="Temperature Graph" style="max-width:100%;"
+         onerror="this.src='/plot';">
 
     <script>
-        function updateData() {
-            // Update latest temperature
-            fetch("/latest")
-                .then(res => res.text())
-                .then(temp => {
-                    document.getElementById("temp").innerText = temp + " °C";
-                });
-
-            // Refresh graph
-            const plot = document.getElementById("plot");
-            plot.src = "/plot?rand=" + new Date().getTime();
-        }
-
-        // Run every 5 seconds
-        setInterval(updateData, 5000);
-        updateData(); // run once immediately
+        // Refresh only the graph every 5 seconds without reloading the page
+        setInterval(() => {
+            const img = document.querySelector("img");
+            img.src = "/plot?ts=" + new Date().getTime(); // cache-buster
+        }, 5000);
     </script>
 </body>
 </html>
